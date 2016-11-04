@@ -1,0 +1,8 @@
+F:\github\loginsert\loginsert\bin\Debug\loginsert.exe.config
+F:\github\loginsert\loginsert\bin\Debug\loginsert.exe
+F:\github\loginsert\loginsert\bin\Debug\loginsert.pdb
+F:\github\loginsert\loginsert\obj\Debug\loginsert.Form1.resources
+F:\github\loginsert\loginsert\obj\Debug\loginsert.Properties.Resources.resources
+F:\github\loginsert\loginsert\obj\Debug\loginsert.csproj.GenerateResource.Cache
+F:\github\loginsert\loginsert\obj\Debug\loginsert.exe
+F:\github\loginsert\loginsert\obj\Debug\loginsert.pdb
