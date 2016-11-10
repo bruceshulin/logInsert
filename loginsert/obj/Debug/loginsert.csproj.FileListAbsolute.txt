@@ -6,3 +6,12 @@ F:\github\loginsert\loginsert\obj\Debug\loginsert.Properties.Resources.resources
 F:\github\loginsert\loginsert\obj\Debug\loginsert.csproj.GenerateResource.Cache
 F:\github\loginsert\loginsert\obj\Debug\loginsert.exe
 F:\github\loginsert\loginsert\obj\Debug\loginsert.pdb
+F:\github\logInsert1\loginsert\bin\Debug\loginsert.exe.config
+F:\github\logInsert1\loginsert\obj\Debug\loginsert.exe
+F:\github\logInsert1\loginsert\obj\Debug\loginsert.pdb
+F:\github\logInsert1\loginsert\bin\Debug\loginsert.exe
+F:\github\logInsert1\loginsert\bin\Debug\loginsert.pdb
+F:\github\logInsert1\loginsert\obj\Debug\loginsert.Form1.resources
+F:\github\logInsert1\loginsert\obj\Debug\loginsert.Properties.Resources.resources
+F:\github\logInsert1\loginsert\obj\Debug\loginsert.csproj.GenerateResource.Cache
+F:\github\logInsert1\loginsert\obj\Debug\loginsert.csprojResolveAssemblyReference.cache
