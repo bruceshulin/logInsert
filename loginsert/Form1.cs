@@ -23,39 +23,185 @@ namespace loginsert
         string Name = "bruce";
         private void button1_Click(object sender, EventArgs e)
         {
-            //打开文件
-            string content = ReadFile(textBox1.Text);
+            string path = textBox1.Text;
+            Boolean isdeath = false;
+            if (System.IO.File.Exists(path))
+            {
+                //说明是文件
+                ChangeFile(path);
+                isdeath = true;
+            } else if (System.IO.Directory.Exists(path))
+            {
+                if (!path.EndsWith("\\"))
+                {
+                    path += "\\";
+                }
+                //说明是目录
+                showDirFile(path);
+                isdeath = true;
+            }
+
+            if(isdeath)
+            {
+                
+                MessageBox.Show("完成");
+            }
+            
+        }
+
+        private void ChangeFile(string file)
+        {
+             //打开文件
             //解析文件
             //替换文件
-            if (content == "")
-            {
-                return;
-            }
-            string ext = Path.GetExtension(textBox1.Text);
-
+            string content = "";
+            string ext = Path.GetExtension(file);
 
             if (ext.ToLower().EndsWith(".java") == true)
             {
+                content = ReadFile(file);
+                if (content == "")
+                {
+                    return;
+                }
                 content = JavaReplaceContent(content);
             }
             else if (ext.ToLower().EndsWith(".c") == true)
             {
-                //content = JavaReplaceContent(content);
+                //content = C_ReplaceContent(content);
             }
-            
+            else
+            {
+                return;
+            }
 
             string filename =  "content"+ DateTime.Now.Ticks.ToString().Substring(7,3)+".txt";
             if (checkBox1.Checked)
             {
-                System.IO.File.WriteAllText(textBox1.Text, content);
+                if(content.Length>0)
+                {
+                    System.IO.File.WriteAllText(file, content);
+                }
             }
             else 
             {
                 System.IO.File.WriteAllText("D:\\" + filename, content);
             }
-            MessageBox.Show("完成");
-            
         }
+
+        private void showDirFile(string dir)
+        {
+            IList<FileInfo> lst = GetFiles(dir);
+            foreach (var item in lst)
+            {
+                ChangeFile(item.FullName);
+            }
+        }
+/*
+        private void button3_Click123(object sender, EventArgs e)
+        {
+            Console.WriteLine("STT");
+            string str = @"D:";
+            if (!str.EndsWith("\\"))
+            {
+                str += "\\";
+            }
+            IList<FileInfo> lst = GetFiles(str);
+            if (!Directory.Exists(str))
+            {
+                try
+                {
+                    Directory.CreateDirectory(str);
+                }
+                catch (Exception err)
+                {
+                    Console.WriteLine(err.Message);
+                    Console.ReadKey();
+                    return;
+                }
+            }
+            if (File.Exists(str + "test.txt"))
+            {
+                File.Delete(str + "test.txt");
+            }
+            FileInfo file = new FileInfo(str + "test.txt");
+            if (!file.Directory.Exists)
+            {
+                Directory.CreateDirectory(file.DirectoryName);
+            }
+            using (StreamWriter outFileWriter = new StreamWriter(str + "test.txt", false, Encoding.UTF8))
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (FileInfo item in lst)
+                {
+                    sb.Append("\"");
+                    sb.Append(item.FullName);
+                    sb.Append("\"");
+                    sb.Append(",");
+                    sb.Append("\r\n");
+                }
+                sb.Remove(sb.Length - 2, 2);
+                outFileWriter.WriteLine(sb.ToString());
+                outFileWriter.Flush();
+                outFileWriter.Close();
+            }
+            Console.WriteLine("END");
+        }
+        */
+        private static void GetDirectorys(string strPath, ref List<string> lstDirect)
+        {
+            DirectoryInfo diFliles = new DirectoryInfo(strPath);
+            DirectoryInfo[] diArr = diFliles.GetDirectories();
+            //DirectorySecurity directorySecurity = null;  
+            foreach (DirectoryInfo di in diArr)
+            {
+                try
+                {
+                    //directorySecurity = new DirectorySecurity(di.FullName, AccessControlSections.Access);  
+                    //if (!directorySecurity.AreAccessRulesProtected)  
+                    //{  
+                    lstDirect.Add(di.FullName);
+                    GetDirectorys(di.FullName, ref lstDirect);
+                    //}  
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+        }
+        /// <summary>  
+        /// 遍历当前目录及子目录  
+        /// </summary>  
+        /// <param name="strPath">文件路径</param>  
+        /// <returns>所有文件</returns>  
+        private static IList<FileInfo> GetFiles(string strPath)
+        {
+            List<FileInfo> lstFiles = new List<FileInfo>();
+            List<string> lstDirect = new List<string>();
+            lstDirect.Add(strPath);
+            DirectoryInfo diFliles = null;
+            GetDirectorys(strPath, ref lstDirect);
+            foreach (string str in lstDirect)
+            {
+                try
+                {
+                    diFliles = new DirectoryInfo(str);
+                    lstFiles.AddRange(diFliles.GetFiles());
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+            return lstFiles;
+        }  
+
+
+
+
+
+
         private void EvnInit()
         {
             if (textBox2.Text.Length > 0)
@@ -96,7 +242,8 @@ namespace loginsert
             //正则表达  [^ ^.]{1,}\([ ,A-Za-z]*\)[\s]*{
             string[] split = content.Split('\n');
 
-            string pattern = "(?<fun>[^ ^.]{1,})[ ]*\\([ ,A-Za-z\\<\\>\\s\\[\\]]*\\)[\\s]*{";
+            //string pattern = "(?<fun>[^ ^.]{1,})[ ]*\\([ ,A-Za-z\\<\\>\\s\\[\\]]*\\)[\\s]*{";
+            string pattern = "(?<fun>[^ ^.]{1,})[ ]*\\([^{^;]*{";
             System.Text.RegularExpressions.MatchCollection mc = System.Text.RegularExpressions.Regex.Matches(content, pattern);
             int index = 0;
             List<string> listFun = new List<string>(); 
@@ -114,11 +261,12 @@ namespace loginsert
                 }
                 string tempold = item.Value;
                 string log = "\r\n\tLog.d(" + Tag + ", \""+Name+" " + item.Groups["fun"] + "() + index " + index + "\");\r\n";
-                index++;
+                
                 if( CheckContentItem(ref tempold,split))
                 {
                     string tempnew = tempold + log;
                     content = content.Replace(tempold, tempnew);
+                    index++;
                 }
                 
 	        }
@@ -155,20 +303,36 @@ namespace loginsert
             return content;
 
         }
+        private bool checkKey(string item)
+        {
+            if (item.Contains("new ") == true || item.Contains("switch") == true || item.Contains("if") == true || item.Contains("while") == true || item.Contains("synchronized") == true)
+            {
+                return false;
+            }
+            return true;
+        }
 
         private bool CheckContentItem(ref string tempold, string[] split)
         {
+            if (checkKey(tempold) == false)
+            {
+                return false ;
+            }
+            if (tempold.Contains("\n"))
+            {
+                return true;
+            }
+            
+
             int  i = 0;
             foreach (string item in split)
             {
                 i++;
-                if (item.Contains(tempold) && item.Contains("new ") == false)
+                if (item.Contains(tempold))
                 {
-                    //上一行判断
-                    //当前行判断
-                    if (item.Contains("new") == true || item.Contains("switch") == true || item.Contains("if") == true || item.Contains("while") == true )
+                    if (checkKey(item) == false)
                     {
-                        return false;
+                        continue;
                     }
                     //下一行判断
                     string nextstr =  jumpSpaceRow(ref i, split);
@@ -187,6 +351,44 @@ namespace loginsert
             return false;
         }
 
+        private void testRunCmdroot()
+        {
+
+            //string str = @"adb devices&&adb root&&adb remount&&adb push W:\W406A\7731C_6.0_23.6\out\debug\target\product\itel_it1409\system\app\Calendar\Calendar.apk system/app/Calendar&&exit";
+            string output = "";
+
+            System.Diagnostics.Process p = new System.Diagnostics.Process();
+            p.StartInfo.FileName = "cmd.exe";
+            p.StartInfo.UseShellExecute = false;    //是否使用操作系统shell启动
+            p.StartInfo.RedirectStandardInput = true;//接受来自调用程序的输入信息
+            p.StartInfo.RedirectStandardOutput = true;//由调用程序获取输出信息
+            p.StartInfo.RedirectStandardError = true;//重定向标准错误输出
+            p.StartInfo.CreateNoWindow = true;//不显示程序窗口
+            p.Start();//启动程序
+
+            //向cmd窗口发送输入信息
+            p.StandardInput.WriteLine("adb devices");
+            p.StandardInput.WriteLine("adb root");
+            p.StandardInput.WriteLine("adb remount");
+            p.StandardInput.WriteLine("exit");
+
+            p.StandardInput.AutoFlush = true;
+            //p.StandardInput.WriteLine("exit");
+            //向标准输入写入要执行的命令。这里使用&是批处理命令的符号，表示前面一个命令不管是否执行成功都执行后面(exit)命令，如果不执行exit命令，后面调用ReadToEnd()方法会假死
+            //同类的符号还有&&和||前者表示必须前一个命令执行成功才会执行后面的命令，后者表示必须前一个命令执行失败才会执行后面的命令
+
+
+
+            //获取cmd窗口的输出信息
+            output = p.StandardOutput.ReadToEnd();
+            txtCmd.Text = output;
+
+            p.WaitForExit();//等待程序执行完退出进程
+            p.Close();
+
+
+            Console.WriteLine(output);
+        }
         private string jumpSpaceRow(ref int i, string[] split)
         {
             while (true)
@@ -230,7 +432,8 @@ namespace loginsert
 
         private void button3_Click(object sender, EventArgs e)
         {
-            testRunCmd();
+            testRunCmdroot();
+            //testRunCmd();
             //test2();
         }
         private void test2()
