@@ -21,6 +21,7 @@ namespace loginsert
         }
         string Tag = "TAG";
         string Name = "bruce";
+        
         private void button1_Click(object sender, EventArgs e)
         {
             string path = textBox1.Text;
@@ -64,7 +65,8 @@ namespace loginsert
                 {
                     return;
                 }
-                content = JavaReplaceContent(content);
+                string fileTagname = Path.GetFileName(file);
+                content = JavaReplaceContent(content, fileTagname);
             }
             else if (ext.ToLower().EndsWith(".c") == true)
             {
@@ -202,7 +204,7 @@ namespace loginsert
 
 
 
-        private void EvnInit()
+        private void EvnInit(string filename)
         {
             if (textBox2.Text.Length > 0)
             {
@@ -210,7 +212,7 @@ namespace loginsert
             }
             else
             {
-                Tag = "TAG";
+                Tag = filename;
             }
             if (textBox3.Text.Length > 0)
             {
@@ -221,9 +223,9 @@ namespace loginsert
                 Name = "bruce";
             }
         }
-        private string CReplaceContent(string content)
+        private string CReplaceContent(string content,string filename)
         {
-            EvnInit();
+            EvnInit(filename);
             //正则表达  [^ ^.]{1,}\([ ,A-Za-z]*\)[\s]*{
             MessageBox.Show("尚未开发");
             return "";
@@ -235,9 +237,9 @@ namespace loginsert
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        private string JavaReplaceContent(string content)
+        private string JavaReplaceContent(string content,string filename)
         {
-            EvnInit();
+            EvnInit(filename);
 
             //正则表达  [^ ^.]{1,}\([ ,A-Za-z]*\)[\s]*{
             string[] split = content.Split('\n');
@@ -260,7 +262,7 @@ namespace loginsert
                     listFun.Add(item.Value);
                 }
                 string tempold = item.Value;
-                string log = "\r\n\tLog.d(" + Tag + ", \""+Name+" " + item.Groups["fun"] + "() + index " + index + "\");\r\n";
+                string log = "\r\n\tLog.d(\"" + Tag + "\", \""+Name+" " + item.Groups["fun"] + "() + index " + index + "\");\r\n";
                 
                 if( CheckContentItem(ref tempold,split))
                 {

@@ -57,6 +57,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label8 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -98,7 +99,6 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(100, 21);
             this.textBox2.TabIndex = 3;
-            this.textBox2.Text = "\"bruce_log\"";
             // 
             // textBox3
             // 
@@ -139,9 +139,9 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(170, 149);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(167, 12);
+            this.label4.Size = new System.Drawing.Size(71, 12);
             this.label4.TabIndex = 7;
-            this.label4.Text = "不写默认TAG: TAG NAME:bruce";
+            this.label4.Text = "不写默bruce";
             // 
             // button2
             // 
@@ -327,6 +327,7 @@
             // 
             this.tabPage1.Controls.Add(this.button2);
             this.tabPage1.Controls.Add(this.button1);
+            this.tabPage1.Controls.Add(this.label8);
             this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.textBox1);
             this.tabPage1.Controls.Add(this.label3);
@@ -353,6 +354,15 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "adb 测试";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(170, 121);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(89, 12);
+            this.label8.TabIndex = 7;
+            this.label8.Text = "不写默认文件名";
             // 
             // Form1
             // 
@@ -403,6 +413,7 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.Label label8;
     }
 }
 
