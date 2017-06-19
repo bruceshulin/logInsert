@@ -13,6 +13,11 @@ using System.Diagnostics;
 
 namespace loginsert
 {
+    enum OP_TYPE
+    {
+        JAVA,
+        C,
+    }
     public partial class Form1 : Form
     {
         public Form1()
@@ -21,11 +26,14 @@ namespace loginsert
         }
         string Tag = "TAG";
         string Name = "bruce";
+        string log_func = "";
+        OP_TYPE OP = OP_TYPE.JAVA;
         
         private void button1_Click(object sender, EventArgs e)
         {
-            string path = textBox1.Text;
-            Boolean isdeath = false;
+            string path = textBox1.Text;    //文件或目录路径
+            Boolean isdeath = false;        //是否是目录
+            log_func = this.txtlogfunc.Text;
             if (System.IO.File.Exists(path))
             {
                 //说明是文件
@@ -58,19 +66,32 @@ namespace loginsert
             string content = "";
             string ext = Path.GetExtension(file);
 
+
+            content = ReadFile(file);
+            if (content == "")
+            {
+                return;
+            }
+            string fileTagname = Path.GetFileName(file);
+
             if (ext.ToLower().EndsWith(".java") == true)
             {
-                content = ReadFile(file);
-                if (content == "")
+                OP = OP_TYPE.JAVA;
+                if (log_func == "")
                 {
-                    return;
+                    log_func = "Log.d";
                 }
-                string fileTagname = Path.GetFileName(file);
+                
                 content = JavaReplaceContent(content, fileTagname);
             }
             else if (ext.ToLower().EndsWith(".c") == true)
             {
-                //content = C_ReplaceContent(content);
+                OP = OP_TYPE.C;
+                if (log_func == "")
+                {
+                    log_func = "printf";
+                }
+                content = C_ReplaceContent(content, fileTagname);
             }
             else
             {
@@ -82,13 +103,65 @@ namespace loginsert
             {
                 if(content.Length>0)
                 {
-                    System.IO.File.WriteAllText(file, content);
+                    try
+                    {
+                        System.IO.File.WriteAllText(file, content);
+                    }
+                    catch (Exception)
+                    {
+                        System.IO.File.WriteAllText("D:\\" + filename, content);
+                        MessageBox.Show("文件没有正确保存，临时存放到D:\\" + filename);
+                    }
+                    
                 }
             }
             else 
             {
                 System.IO.File.WriteAllText("D:\\" + filename, content);
             }
+        }
+
+        private string C_ReplaceContent(string content, string filename)
+        {
+            EvnInit(filename);
+
+            //正则表达  [^ ^.]{1,}\([ ,A-Za-z]*\)[\s]*{
+            string[] split = content.Split('\n');
+
+            //string pattern = "(?<fun>[^ ^.]{1,})[ ]*\\([ ,A-Za-z\\<\\>\\s\\[\\]]*\\)[\\s]*{";
+            string pattern = "(?<fun>[^ ^.]{1,})[ ]*\\([^{^;]*{";
+            System.Text.RegularExpressions.MatchCollection mc = System.Text.RegularExpressions.Regex.Matches(content, pattern);
+            int index = 0;
+            List<string> listFun = new List<string>();
+
+            foreach (Match item in mc)
+            {
+                System.Console.WriteLine(item.Value);
+                if (listFun.Contains(item.Value))
+                {
+                    continue;
+                }
+                else
+                {
+                    listFun.Add(item.Value);
+                }
+                string tempold = item.Value;
+                string log = "\r\n\t" + log_func + "(\"" + Tag + " " + Name + " " + item.Groups["fun"] + "() + index " + index + "\\n\");\r\n";
+
+                if (CheckContentItem(ref tempold, split))
+                {
+                    string tempnew = tempold + log;
+                    content = content.Replace(tempold, tempnew);
+                    index++;
+                }
+
+            }
+
+            System.Console.WriteLine("总行数：" + mc.Count);
+            //需要对内容进行过滤
+            //1如果没有加log包，那么添加包－－－－－
+            content = isImportLog(content, split);
+            return content;
         }
 
         private void showDirFile(string dir)
@@ -305,12 +378,39 @@ namespace loginsert
             return content;
 
         }
-        private bool checkKey(string item)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="functionline">函数名那一行</param>
+        /// <returns></returns>
+        private bool checkKey(string functionline)
         {
+            List<string> listfilter = new List<string>();
+            listfilter.Add("new ");
+            listfilter.Add("switch");
+            listfilter.Add("if");
+            listfilter.Add("while");
+            listfilter.Add("synchronized");
+            listfilter.Add("synchronized");
+            listfilter.Add("#");
+            listfilter.Add(" \\");
+            
+            //如果这一行里有注释的话那就得进行分隔
+
+            foreach (var filter in listfilter)
+            {
+                if (functionline.Contains(filter))
+                {
+                    return false;
+                }
+            }
+
+            /* old code
             if (item.Contains("new ") == true || item.Contains("switch") == true || item.Contains("if") == true || item.Contains("while") == true || item.Contains("synchronized") == true)
             {
                 return false;
-            }
+            }*/
+
             return true;
         }
 
@@ -574,5 +674,80 @@ namespace loginsert
         {
             System.Diagnostics.Process.Start(@"C:\Users\Administrator\Desktop\IT1409-W406A-6.0-20161028-DEBUG\IT1409-W406A-6.0-20161028-DEBUG\ResearchDownload.exe");
         }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+           // testRunCmdpullLog();
+            string cmd1 = "adb root";
+            string cmd2 = "adb remount";
+            string cmd3 = "adb pull /data/slog/";
+
+            DoDos(cmd1,cmd2,cmd3);
+        }
+        private void testRunCmdpullLog()
+        {
+
+            //string str = @"adb devices&&adb root&&adb remount&&adb push W:\W406A\7731C_6.0_23.6\out\debug\target\product\itel_it1409\system\app\Calendar\Calendar.apk system/app/Calendar&&exit";
+            string output = "";
+
+            System.Diagnostics.Process p = new System.Diagnostics.Process();
+            p.StartInfo.FileName = "cmd.exe";
+            p.StartInfo.UseShellExecute = false;    //是否使用操作系统shell启动
+            p.StartInfo.RedirectStandardInput = true;//接受来自调用程序的输入信息
+            p.StartInfo.RedirectStandardOutput = true;//由调用程序获取输出信息
+            p.StartInfo.RedirectStandardError = true;//重定向标准错误输出
+            p.StartInfo.CreateNoWindow = true;//不显示程序窗口
+            p.Start();//启动程序
+
+            //向cmd窗口发送输入信息
+            p.StandardInput.WriteLine("adb devices");
+            p.StandardInput.WriteLine("adb root");
+            p.StandardInput.WriteLine("adb remount");
+            p.StandardInput.WriteLine("adb pull /data/slog/ d:/");
+            p.StandardInput.WriteLine("exit");
+
+            p.StandardInput.AutoFlush = true;
+            //p.StandardInput.WriteLine("exit");
+            //向标准输入写入要执行的命令。这里使用&是批处理命令的符号，表示前面一个命令不管是否执行成功都执行后面(exit)命令，如果不执行exit命令，后面调用ReadToEnd()方法会假死
+            //同类的符号还有&&和||前者表示必须前一个命令执行成功才会执行后面的命令，后者表示必须前一个命令执行失败才会执行后面的命令
+
+
+
+            //获取cmd窗口的输出信息
+            output = p.StandardOutput.ReadToEnd();
+            txtCmd.Text = output;
+
+            p.WaitForExit();//等待程序执行完退出进程
+            p.Close();
+
+
+            Console.WriteLine(output);
+        }
+
+        public void DoDos(string comd1, string comd2, string comd3)
+        {
+            string output = null;
+            Process p = new Process();//创建进程对象 
+            p.StartInfo.FileName = "cmd.exe";//设定需要执行的命令 
+            // startInfo.Arguments = "/C " + command;//“/C”表示执行完命令后马上退出  
+            p.StartInfo.UseShellExecute = false;//不使用系统外壳程序启动 
+            p.StartInfo.RedirectStandardInput = true;//可以重定向输入  
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardError = true;
+            p.StartInfo.CreateNoWindow = false;//不创建窗口 
+            p.Start();
+            // string comStr = comd1 + "&" + comd2 + "&" + comd3;
+            p.StandardInput.WriteLine(comd1);
+            p.StandardInput.WriteLine(comd2);
+            p.StandardInput.WriteLine(comd3);
+            //  output = p.StandardOutput.ReadToEnd();
+            if (p != null)
+            {
+                p.Close();
+            }
+            // return output;
+        }
+
+
     }
 }

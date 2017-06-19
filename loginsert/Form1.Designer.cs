@@ -56,8 +56,12 @@
             this.button5 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.txtlogfunc = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.button8 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -66,7 +70,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(283, 65);
+            this.button1.Location = new System.Drawing.Point(405, 68);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 0;
@@ -76,9 +80,10 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(21, 39);
+            this.textBox1.Location = new System.Drawing.Point(21, 37);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(259, 21);
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBox1.Size = new System.Drawing.Size(459, 21);
             this.textBox1.TabIndex = 1;
             // 
             // checkBox1
@@ -145,17 +150,17 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(283, 39);
+            this.button2.Location = new System.Drawing.Point(486, 37);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.Size = new System.Drawing.Size(37, 23);
             this.button2.TabIndex = 0;
-            this.button2.Text = "………";
+            this.button2.Text = "…";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(393, 42);
+            this.button3.Location = new System.Drawing.Point(392, 46);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 39);
             this.button3.TabIndex = 8;
@@ -325,9 +330,12 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.txtlogfunc);
             this.tabPage1.Controls.Add(this.button2);
             this.tabPage1.Controls.Add(this.button1);
             this.tabPage1.Controls.Add(this.label8);
+            this.tabPage1.Controls.Add(this.label10);
+            this.tabPage1.Controls.Add(this.label9);
             this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.textBox1);
             this.tabPage1.Controls.Add(this.label3);
@@ -344,16 +352,12 @@
             this.tabPage1.Text = "log输出";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // tabPage2
+            // txtlogfunc
             // 
-            this.tabPage2.Controls.Add(this.groupBox1);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(529, 411);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "adb 测试";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.txtlogfunc.Location = new System.Drawing.Point(96, 177);
+            this.txtlogfunc.Name = "txtlogfunc";
+            this.txtlogfunc.Size = new System.Drawing.Size(147, 21);
+            this.txtlogfunc.TabIndex = 8;
             // 
             // label8
             // 
@@ -363,6 +367,46 @@
             this.label8.Size = new System.Drawing.Size(89, 12);
             this.label8.TabIndex = 7;
             this.label8.Text = "不写默认文件名";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(19, 180);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(71, 12);
+            this.label10.TabIndex = 7;
+            this.label10.Text = "LOG 函数名:";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(249, 180);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(71, 12);
+            this.label9.TabIndex = 7;
+            this.label9.Text = "不写默log.d";
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.groupBox1);
+            this.tabPage2.Controls.Add(this.button8);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(529, 411);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "adb 测试";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // button8
+            // 
+            this.button8.Location = new System.Drawing.Point(385, 366);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(75, 39);
+            this.button8.TabIndex = 8;
+            this.button8.Text = "Pull Log";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
             // Form1
             // 
@@ -385,7 +429,6 @@
         #endregion
 
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox textBox3;
@@ -414,6 +457,11 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.TextBox txtlogfunc;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label10;
+        public System.Windows.Forms.TextBox textBox1;
     }
 }
 
